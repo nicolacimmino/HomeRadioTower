@@ -16,6 +16,8 @@
 
 #include "src/NRF24L01RadioDriver.h"
 #include "src/TimeBroadcast.h"
+#include "src/RF24_Terminal.h"
+#include <VT100.h>
 
 NRF24L01RadioDriver *radio;
 uRTCLib *rtc;
@@ -28,14 +30,20 @@ void setup(void)
   radio->setRXExtendedPreamble(643234);
   radio->setTXExtendedPreamble(643234);
   radio->setTXPower(3);
-  radio->setRFChannel(TIME_BROADCAST_CHANNEL);
 
   Wire.begin();
   rtc = new uRTCLib(0x68);
   //rtc->set(0, 0, 13, 6, 21, 11, 20);
+
+   VT100.begin(Serial);
 }
 
 void loop()
 {
   broadcastTime();
+
+  if (Serial.read() == TERMINAL_KEY_ESC)
+  {  
+    serveTerminal();
+  }
 }
